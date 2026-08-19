@@ -7,18 +7,17 @@ locals {
   # re-include 127.0.0.1 / localhost here or host-based access (the helm
   # provider using the 127.0.0.1:<port> kubeconfig) breaks.
   cert_san_patch = { for name in [
-    "build-farm-east",
-    "build-farm-west",
+    "build-farm",
     "app-a",
     ] : name => "kind: ClusterConfiguration\napiServer:\n  certSANs:\n    - 127.0.0.1\n    - localhost\n    - ${name}-control-plane\n"
   }
 }
 
-resource "kind_cluster" "build_farm_east" {
-  name            = "build-farm-east"
+resource "kind_cluster" "build_farm" {
+  name            = "build-farm"
   node_image      = "kindest/node:${var.kubernetes_version}"
   wait_for_ready  = true
-  kubeconfig_path = "${path.module}/.kube/east.config"
+  kubeconfig_path = "${path.module}/.kube/build-farm.config"
 
   kind_config {
     kind        = "Cluster"
@@ -26,24 +25,7 @@ resource "kind_cluster" "build_farm_east" {
 
     node {
       role                   = "control-plane"
-      kubeadm_config_patches = [local.cert_san_patch["build-farm-east"]]
-    }
-  }
-}
-
-resource "kind_cluster" "build_farm_west" {
-  name            = "build-farm-west"
-  node_image      = "kindest/node:${var.kubernetes_version}"
-  wait_for_ready  = true
-  kubeconfig_path = "${path.module}/.kube/west.config"
-
-  kind_config {
-    kind        = "Cluster"
-    api_version = "kind.x-k8s.io/v1alpha4"
-
-    node {
-      role                   = "control-plane"
-      kubeadm_config_patches = [local.cert_san_patch["build-farm-west"]]
+      kubeadm_config_patches = [local.cert_san_patch["build-farm"]]
     }
   }
 }

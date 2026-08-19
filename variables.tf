@@ -12,6 +12,11 @@ variable "harness_endpoint" {
   default = "https://app.harness.io/gateway"
 }
 
+variable "manager_endpoint" {
+  type    = string
+  default = "https://app.harness.io/gratis"
+}
+
 # connector details
 
 ## github

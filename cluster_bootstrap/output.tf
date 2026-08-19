@@ -1,8 +1,7 @@
 locals {
   clusters = {
     for c in [
-      kind_cluster.build_farm_east,
-      kind_cluster.build_farm_west,
+      kind_cluster.build_farm,
       kind_cluster.app_a,
       ] : c.name => {
       master_url           = "https://${c.name}-control-plane:6443"
@@ -19,12 +18,8 @@ output "clusters" {
   sensitive = true
 }
 
-output "build-farm-east-endpoint" {
-  value = kind_cluster.build_farm_east.endpoint
-}
-
-output "build-farm-west-endpoint" {
-  value = kind_cluster.build_farm_west.endpoint
+output "build-farm-endpoint" {
+  value = kind_cluster.build_farm.endpoint
 }
 
 output "app-a-endpoint" {

@@ -16,6 +16,8 @@ to deploy the required clusters, navigate to the `cluster_bootstrap` directory a
 
 this will generate local kubeconfig files for each cluster in the `cluster_bootstrap/.kube` directory, to be referenced in the core tofu configuration.
 
+you can then use the cluster by doing `KUBECONFIG=cluster_bootstrap/.kube/build-farm.config kubectl get pods -A`.
+
 # running
 
 this project will deploy all baseline resources nessesary to set up a harness account for general usage.
