@@ -44,7 +44,7 @@ resource "harness_platform_connector_kubernetes" "build_farm" {
   identifier  = "build_farm"
   name        = "build_farm"
   description = "Kubernetes connector for build farm pool"
-  tags        = ["source:terraform"]
+  tags        = ["source:opentofu"]
 
   inherit_from_delegate {
     delegate_selectors = ["build-farm"]

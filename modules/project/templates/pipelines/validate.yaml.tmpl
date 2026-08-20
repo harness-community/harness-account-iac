@@ -1,0 +1,36 @@
+pipeline:
+  name: ${PIPELINE_NAME}
+  identifier: ${PIPELINE_ID}
+  projectIdentifier: ${PROJECT_ID}
+  orgIdentifier: ${ORG_ID}
+  tags:
+    source: opentofu
+  stages:
+    - stage:
+        name: run
+        identifier: run
+        description: ""
+        type: Custom
+        tags: {}
+        spec:
+          execution:
+            steps:
+              - stepGroup:
+                  name: container steps
+                  identifier: container_steps
+                  steps:
+                    - step:
+                        type: Run
+                        name: run
+                        identifier: run
+                        spec:
+                          connectorRef: ${DOCKER_CONNECTOR_ID}
+                          image: ${IMAGE}
+                          shell: Sh
+                          command: echo 'hello from harness'
+                  stepGroupInfra:
+                    type: KubernetesDirect
+                    spec:
+                      connectorRef: ${K8S_CONNECTOR_ID}
+                      namespace: ${K8S_NAMESPACE}
+        

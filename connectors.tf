@@ -3,7 +3,7 @@ resource "harness_platform_secret_text" "github" {
   identifier  = "github"
   name        = "github"
   description = "GitHub personal access token for resolving repositories"
-  tags        = ["source:terraform"]
+  tags        = ["source:opentofu"]
 
   secret_manager_identifier = "harnessSecretManager"
   value_type                = "Inline"
@@ -18,7 +18,7 @@ resource "harness_platform_connector_github" "global" {
   identifier  = "global"
   name        = "global"
   description = "resolve repositories from public github"
-  tags        = ["source:terraform"]
+  tags        = ["source:opentofu"]
 
   url                 = "https://github.com"
   connection_type     = "Account"
@@ -42,7 +42,7 @@ resource "harness_platform_secret_text" "dockerhub" {
   identifier  = "dockerhub"
   name        = "dockerhub"
   description = "DockerHub username and password for resolving images"
-  tags        = ["source:terraform"]
+  tags        = ["source:opentofu"]
 
   secret_manager_identifier = "harnessSecretManager"
   value_type                = "Inline"
@@ -57,7 +57,7 @@ resource "harness_platform_connector_docker" "dockerhub" {
   identifier  = "dockerhub"
   name        = "dockerhub"
   description = "resolve images from public dockerhub"
-  tags        = ["source:terraform"]
+  tags        = ["source:opentofu"]
 
   type                = "DockerHub"
   url                 = "https://registry.hub.docker.com/v2"

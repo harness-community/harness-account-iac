@@ -27,7 +27,7 @@ resource "harness_platform_secret_text" "cluster" {
   identifier  = replace(each.key, "-", "_")
   name        = each.key
   description = "${each.value.attr} for Kubernetes connector: ${each.value.cluster_key}"
-  tags        = ["source:terraform"]
+  tags        = ["source:opentofu"]
 
   secret_manager_identifier = "harnessSecretManager"
   value_type                = "Inline"
