@@ -32,7 +32,7 @@ module "build_farm" {
   deploy_mode      = "KUBERNETES"
   namespace        = "harness-delegate-ng"
   manager_endpoint = var.manager_endpoint
-  delegate_image   = "us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:${data.harness_platform_delegate_default_version.current.minimal_version}"
+  delegate_image   = "us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:${data.harness_platform_delegate_default_version.current.version}"
   replicas         = 1
   upgrader_enabled = false
   values           = local.delegate_values

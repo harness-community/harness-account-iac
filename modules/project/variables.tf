@@ -23,3 +23,15 @@ variable "clusters" {
   }))
   default = null
 }
+
+variable "dockerhub_connector_id" {
+  type = string
+}
+
+variable "generic_helm_chart_connector_id" {
+  type = string
+}
+
+variable "generic_helm_chart_values_file_id" {
+  type = string
+}

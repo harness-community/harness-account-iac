@@ -1,0 +1,8 @@
+deployment:
+  image:
+    repository: <+artifacts.primary.image.split(":")[0]>
+    tag: <+artifacts.primary.image.split(":")[1]>
+  containerSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    readOnlyRootFilesystem: true

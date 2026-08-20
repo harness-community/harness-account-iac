@@ -49,7 +49,7 @@ resource "harness_platform_connector_kubernetes" "clientKeyCert" {
   identifier  = replace(each.key, "-", "_")
   name        = each.key
   description = "Kubernetes connector for cluster: ${each.key}"
-  tags        = ["source:terraform"]
+  tags        = ["source:opentofu"]
 
   client_key_cert {
     master_url                = each.value.master_url
@@ -59,4 +59,37 @@ resource "harness_platform_connector_kubernetes" "clientKeyCert" {
     client_key_passphrase_ref = try(harness_platform_secret_text.cluster["${each.key}_client_key_passphrase"].identifier, null)
     client_key_algorithm      = each.value.client_key_algorithm
   }
+}
+
+resource "harness_platform_infrastructure" "kubernetes" {
+  for_each = var.clusters
+
+  org_id     = var.org_id
+  project_id = harness_platform_project.this.id
+
+  identifier      = replace(each.key, "-", "_")
+  name            = each.key
+  env_id          = harness_platform_environment.demo.id
+  type            = "KubernetesDirect"
+  deployment_type = "Kubernetes"
+  tags            = ["source:opentofu"]
+
+  yaml = <<-EOT
+        infrastructureDefinition:
+         name: ${each.key}
+         identifier: ${replace(each.key, "-", "_")}
+         description: ""
+         tags:
+           source: "opentofu"
+         orgIdentifier: ${harness_platform_project.this.org_id}
+         projectIdentifier: ${harness_platform_project.this.id}
+         environmentRef: ${harness_platform_environment.demo.id}
+         deploymentType: Kubernetes
+         type: KubernetesDirect
+         spec:
+          connectorRef: ${harness_platform_connector_kubernetes.clientKeyCert[each.key].identifier}
+          namespace: <+input>
+          releaseName: release-<+INFRA_KEY>
+          allowSimultaneousDeployments: false
+      EOT
 }

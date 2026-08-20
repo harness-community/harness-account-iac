@@ -70,7 +70,7 @@ we create a `Lab` organization for demonstration purposes.
 
 finally we create a project for `application a`.
 
-within this project we create a kubernetes connector that uses masterURL and credentials to connect to one of our application clusters. this cluster is connected to from the build-farm delegate, and uses a masterURL so we do not have to deploy a delegate in each cluster, following the "hub and spoke" model. in theory this pipeline could also be used to run pipelines.
+within this project we create a kubernetes connector that uses masterURL and credentials to connect to one of our application clusters. this cluster is connected to from the build-farm delegate, and uses a masterURL so we do not have to deploy a delegate in each cluster, following the "hub and spoke" model.
 
 we then create a pipeline which runs a simple hello world script, which takes in the kubernetes connector, namespace, docker connector and image as a runtime input so it can be used to test the different resources created in this lab.
 
