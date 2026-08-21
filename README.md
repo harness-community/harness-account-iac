@@ -62,6 +62,18 @@ to enable the aformentioned containerized pipelines we create a kubernetes conne
 
 we pin this connector to the delegate tag __build-farm__ and in production you would deploy multiple build farm clusters with delegates that share this tag.
 
+## helm chart template
+
+to easily enable deployments of simple containers, we create an oci helm chart connector to point at `` which is a generic chart that enables deployments based on a values file.
+
+we also create a harness file in the built-in file store with an example values file for this chart which pulls in the container information from the artifact defined on a service.
+
+## templates
+
+to created best-practice patterns we can create account level tempaltes for repeatable resources across the entire account.
+
+here we create a basic kubernetes rolling deployment stage template to be reused across projects when doing deployments of this type.
+
 # orgs
 
 we create a `Lab` organization for demonstration purposes.
@@ -73,6 +85,12 @@ finally we create a project for `application a`.
 within this project we create a kubernetes connector that uses masterURL and credentials to connect to one of our application clusters. this cluster is connected to from the build-farm delegate, and uses a masterURL so we do not have to deploy a delegate in each cluster, following the "hub and spoke" model.
 
 we then create a pipeline which runs a simple hello world script, which takes in the kubernetes connector, namespace, docker connector and image as a runtime input so it can be used to test the different resources created in this lab.
+
+## service
+
+we create a service for an example app `pod info` which leverages the generic helm chart defined at the account level.
+
+an artifact is defined to target the image and pull in the target tag at runtime.
 
 # advanced configuration
 
