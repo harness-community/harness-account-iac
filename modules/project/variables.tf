@@ -41,3 +41,8 @@ variable "loki_endpoint" {
   type        = string
   default     = null
 }
+
+variable "gitops_agent_id" {
+  description = "Identifier of the Harness GitOps agent to register spoke clusters against (include scope prefix, e.g. 'account.hub')."
+  type        = string
+}
