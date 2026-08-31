@@ -24,4 +24,5 @@ module "org_lab_project" {
   dockerhub_connector_id            = harness_platform_connector_docker.dockerhub.id
   generic_helm_chart_connector_id   = module.org_lab.generic_helm_chart_connector_id
   generic_helm_chart_values_file_id = module.org_lab.generic_helm_chart_values_file_id
+  loki_endpoint                     = try(data.terraform_remote_state.cluster_bootstrap.outputs["loki-endpoint"], null)
 }

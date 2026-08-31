@@ -13,14 +13,15 @@ resource "harness_platform_delegatetoken" "build_farm" {
 
 provider "helm" {
   alias = "build_farm"
-  kubernetes {
+  kubernetes = {
     config_path = "${path.module}/cluster_bootstrap/.kube/build-farm.config"
   }
 }
 
 module "build_farm" {
-  source  = "harness/harness-delegate/kubernetes"
-  version = "0.2.3"
+  # source  = "harness/harness-delegate/kubernetes"
+  # version = "0.2.3"
+  source = "/Users/rileysnyder/git/terraform-kubernetes-harness-delegate"
 
   providers = {
     helm = helm.build_farm
@@ -31,6 +32,7 @@ module "build_farm" {
   delegate_name    = "build-farm"
   deploy_mode      = "KUBERNETES"
   namespace        = "harness-delegate-ng"
+  chart_version    = "1.0.0"
   manager_endpoint = var.manager_endpoint
   delegate_image   = "us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:${data.harness_platform_delegate_default_version.current.version}"
   replicas         = 1

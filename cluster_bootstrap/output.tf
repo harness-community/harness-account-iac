@@ -26,3 +26,7 @@ output "app-a-endpoint" {
   value = kind_cluster.app_a.endpoint
 }
 
+output "loki-endpoint" {
+  value = var.enable_loki ? "http://${kind_cluster.app_a.name}-control-plane:31100/" : null
+}
+

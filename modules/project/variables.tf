@@ -35,3 +35,9 @@ variable "generic_helm_chart_connector_id" {
 variable "generic_helm_chart_values_file_id" {
   type = string
 }
+
+variable "loki_endpoint" {
+  description = "Base URL of the in-cluster loki service (e.g. output of cluster_bootstrap's loki-endpoint), or null to skip creating the connector."
+  type        = string
+  default     = null
+}

@@ -22,3 +22,9 @@ variable "colima" {
   type        = bool
   default     = false
 }
+
+variable "enable_loki" {
+  description = "Deploy the loki-stack (loki + promtail, default namespace only, 24h retention) into the app-a cluster for harness CV log health sources."
+  type        = bool
+  default     = false
+}

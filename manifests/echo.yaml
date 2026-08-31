@@ -1,0 +1,21 @@
+# echo-specific override: static workload label (see manifests/podinfo.yaml)
+# plus LOG_WITHOUT_NEWLINE so the JSON request dump is one line per log
+# entry instead of one line per JSON field - much easier to query/read in
+# loki. Port 8080 already matches the generic application chart's default,
+# no port override needed.
+deployment:
+  podLabels:
+    workload: echo
+  env:
+    LOG_WITHOUT_NEWLINE:
+      value: "true"
+  # sidecar that pings the app's own port every 5s so there's a steady
+  # stream of log lines without needing an external caller.
+  additionalContainers:
+    pinger:
+      image: curlimages/curl:8.11.1
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/sh"]
+      args:
+        - -c
+        - while true; do curl -s -o /dev/null http://localhost:8080/ping; sleep 5; done

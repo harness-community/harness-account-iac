@@ -40,3 +40,4 @@ variable "docker_password" {
   type    = string
   default = null
 }
+

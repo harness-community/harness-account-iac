@@ -1,16 +1,31 @@
-resource "harness_platform_service" "podinfo" {
+resource "harness_platform_file_store_file" "echo_values" {
+  org_id     = var.org_id
+  project_id = harness_platform_project.this.id
+
+  identifier  = "echo_values"
+  name        = "echo_values"
+  description = "Helm values override for echo (static workload label)"
+  tags        = ["source:opentofu"]
+
+  parent_identifier = "Root"
+  file_content_path = "manifests/echo.yaml"
+  mime_type         = "application/yaml"
+  file_usage        = "MANIFEST_FILE"
+}
+
+resource "harness_platform_service" "echo" {
 
   org_id     = var.org_id
   project_id = harness_platform_project.this.id
 
-  identifier  = "podinfo"
-  name        = "podinfo"
-  description = "podinfo service"
+  identifier  = "echo"
+  name        = "echo"
+  description = "http-echo service - logs every request to stdout, for exercising the loki log pipeline"
 
   yaml = <<-EOT
 service:
-  name: podinfo
-  identifier: podinfo
+  name: echo
+  identifier: echo
   orgIdentifier: ${var.org_id}
   projectIdentifier: ${harness_platform_project.this.id}
   serviceDefinition:
@@ -45,6 +60,7 @@ service:
                 spec:
                   files:
                     - org:/${var.generic_helm_chart_values_file_id}
+                    - /${harness_platform_file_store_file.echo_values.identifier}
               optionalValuesYaml: false
       artifacts:
         primary:
@@ -52,7 +68,7 @@ service:
           sources:
             - spec:
                 connectorRef: account.${var.dockerhub_connector_id}
-                imagePath: stefanprodan/podinfo
+                imagePath: mendhak/http-https-echo
                 tag: <+input>
                 digest: ""
               identifier: main

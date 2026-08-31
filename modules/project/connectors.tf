@@ -93,3 +93,26 @@ resource "harness_platform_infrastructure" "kubernetes" {
           allowSimultaneousDeployments: false
       EOT
 }
+
+# harness CV (SRM) uses the generic "custom health source" connector type
+# for grafana loki (there is no dedicated loki connector resource) - see
+# https://developer.harness.io/3k-docs/continuous-delivery/verify/configure-cv/health-sources/loki/
+# loki lives in the app-a kind cluster, reachable from the build-farm
+# delegate via the NodePort cluster_bootstrap exposes it on (see
+# cluster_bootstrap/loki.tf); url is wired in from that module's output.
+resource "harness_platform_connector_customhealthsource" "loki" {
+  count = var.loki_endpoint != null ? 1 : 0
+
+  org_id     = var.org_id
+  project_id = harness_platform_project.this.id
+
+  identifier  = "loki"
+  name        = "loki"
+  description = "Loki connector for app-a default namespace logs"
+  tags        = ["source:opentofu"]
+
+  url                = var.loki_endpoint
+  method             = "GET"
+  validation_path    = "loki/api/v1/labels"
+  delegate_selectors = ["build-farm"]
+}

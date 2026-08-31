@@ -1,0 +1,18 @@
+# podinfo-specific override: the container listens on 9898, not the
+# generic application chart's default 8080. podLabels.workload is a fixed
+# label (unlike the pod/container names, which are derived from the
+# per-deploy helm release hash and change every release) - promtail
+# promotes it to a loki label so queries stay stable across deploys.
+deployment:
+  podLabels:
+    workload: podinfo
+  ports:
+    - containerPort: 9898
+      name: http
+      protocol: TCP
+service:
+  ports:
+    - port: 8080
+      name: http
+      protocol: TCP
+      targetPort: 9898
