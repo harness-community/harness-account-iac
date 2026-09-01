@@ -43,6 +43,9 @@ resource "helm_release" "gitops_agent" {
     # (1 cpu/2Gi per component) down to something a lab node can schedule.
     # ponytail: fixed-size trim, bump if the hub cluster gets bigger nodes.
     agent = {
+      image = {
+        tag = "v0.125.0"
+      }
       resources = {
         requests = { cpu = "250m", memory = "256Mi" }
         limits   = { cpu = "250m", memory = "256Mi" }
