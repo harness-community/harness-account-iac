@@ -1,0 +1,133 @@
+pipeline:
+  name: ${PIPELINE_NAME}
+  identifier: ${PIPELINE_ID}
+  projectIdentifier: ${PROJECT_ID}
+  orgIdentifier: ${ORG_ID}
+  tags:
+    source: opentofu
+  variables:
+    - name: replica_count
+      type: String
+      value: <+input>.default(3)
+  stages:
+    - stage:
+        name: deploy
+        identifier: deploy
+        description: "bump replicaCount in the release repo, open a PR, merge it, then sync the argocd application"
+        type: Deployment
+        tags: {}
+        spec:
+          deploymentType: Kubernetes
+          gitOpsEnabled: true
+          service:
+            serviceRef: ${SERVICE_ID}
+          environment:
+            environmentRef: ${ENVIRONMENT_ID}
+            gitOpsClusters:
+              - identifier: ${CLUSTER_ID}
+          execution:
+            steps:
+              - step:
+                  type: GitOpsUpdateReleaseRepo
+                  name: Update Release Repo
+                  identifier: UpdateReleaseRepo
+                  timeout: 10m
+                  spec:
+                    variables:
+                      - name: replicaCount
+                        type: String
+                        value: <+pipeline.variables.replica_count>
+                    prTitle: "gitops: bump replicaCount"
+                    allowNoFilesChanged: true
+              - step:
+                  type: MergePR
+                  name: Merge PR
+                  identifier: MergePR
+                  timeout: 10m
+                  spec:
+                    mergeStrategy: squash
+                    deleteSourceBranch: true
+              - step:
+                  type: GitOpsSync
+                  name: GitOps Sync
+                  identifier: GitOpsSync
+                  timeout: 10m
+                  spec:
+                    applicationsList:
+                      - agentId: ${AGENT_ID}
+                        applicationName: ${APPLICATION_NAME}
+                    prune: true
+                    dryRun: false
+                    applyOnly: false
+                    forceApply: false
+                    syncOptions:
+                      skipSchemaValidation: false
+                      autoCreateNamespace: false
+                      pruneResourcesAtLast: false
+                      applyOutOfSyncOnly: false
+                      replaceResources: false
+                      serverSideApply: false
+                      respectIgnoreDifferences: false
+                      prunePropagationPolicy: foreground
+                    waitTillHealthy: true
+                    failOnTimeout: false
+              - step:
+                  type: Verify
+                  name: Verify Replicas
+                  identifier: VerifyReplicas
+                  spec:
+                    isMultiServicesOrEnvs: false
+                    type: Auto
+                    monitoredService:
+                      type: Default
+                      spec: {}
+                    spec:
+                      sensitivity: LOW
+                      duration: 5m
+                      baseline: LAST
+                      failOnNoAnalysis: false
+                  timeout: 30m
+                  failureStrategies:
+                    - onFailure:
+                        errors:
+                          - Verification
+                        action:
+                          type: ManualIntervention
+                          spec:
+                            timeout: 2h
+                            onTimeout:
+                              action:
+                                type: Ignore
+                    - onFailure:
+                        errors:
+                          - Unknown
+                        action:
+                          type: ManualIntervention
+                          spec:
+                            timeout: 2h
+                            onTimeout:
+                              action:
+                                type: Ignore
+            rollbackSteps:
+              - step:
+                  type: RevertPR
+                  name: Revert PR
+                  identifier: RevertPR
+                  timeout: 10m
+                  spec:
+                    commitId: <+execution.steps.UpdateReleaseRepo.updateReleaseRepoOutcome.commitId>
+                    prTitle: "revert: gitops replicaCount bump"
+              - step:
+                  type: MergePR
+                  name: Merge Revert PR
+                  identifier: MergeRevertPR
+                  timeout: 10m
+                  spec:
+                    mergeStrategy: squash
+                    deleteSourceBranch: true
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback

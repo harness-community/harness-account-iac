@@ -1,0 +1,59 @@
+pipeline:
+  name: ${PIPELINE_NAME}
+  identifier: ${PIPELINE_ID}
+  projectIdentifier: ${PROJECT_ID}
+  orgIdentifier: ${ORG_ID}
+  tags:
+    source: opentofu
+  stages:
+    - stage:
+        name: sync
+        identifier: sync
+        description: "force an immediate argocd sync of the example-apps applicationset"
+        type: Deployment
+        tags: {}
+        spec:
+          deploymentType: Kubernetes
+          gitOpsEnabled: true
+          service:
+            serviceRef: ${SERVICE_ID}
+          environment:
+            environmentRef: ${ENVIRONMENT_ID}
+            gitOpsClusters:
+%{ for cluster_id in CLUSTER_IDS ~}
+              - identifier: ${cluster_id}
+%{ endfor ~}
+          execution:
+            steps:
+              - step:
+                  type: GitOpsSync
+                  name: GitOps Sync
+                  identifier: GitOpsSync
+                  spec:
+                    applicationsList:
+%{ for app in APPLICATIONS ~}
+                      - agentId: ${app.agentId}
+                        applicationName: ${app.applicationName}
+%{ endfor ~}
+                    prune: true
+                    dryRun: false
+                    applyOnly: false
+                    forceApply: false
+                    syncOptions:
+                      skipSchemaValidation: false
+                      autoCreateNamespace: false
+                      pruneResourcesAtLast: false
+                      applyOutOfSyncOnly: false
+                      replaceResources: false
+                      serverSideApply: false
+                      respectIgnoreDifferences: false
+                      prunePropagationPolicy: foreground
+                    waitTillHealthy: true
+                    failOnTimeout: false
+                  timeout: 10m
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback

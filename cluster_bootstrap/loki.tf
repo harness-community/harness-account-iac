@@ -2,7 +2,7 @@
 # sources: loki over elasticsearch, since elasticsearch needs a jvm heap
 # (realistically 1-2gb minimum just to stay up) while loki's single-binary
 # mode with filesystem storage runs comfortably in <200mb - the right size
-# for a kind node. promtail is scoped to the "default" namespace only so
+# for a kind node. promtail is scoped to a small allowlist of namespaces so
 # kube-system/delegate pod logs never get ingested, and retention is capped
 # small since this is throwaway dev/test data.
 #
@@ -31,7 +31,7 @@ promtail:
     snippets:
       extraRelabelConfigs:
         - source_labels: [__meta_kubernetes_namespace]
-          regex: default
+          regex: default|python-app-pr
           action: keep
         - source_labels: [__meta_kubernetes_pod_label_workload]
           target_label: workload
